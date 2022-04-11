@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String            @id @db.Uuid
+  firstname     String            @db.VarChar(30)
+  lastname      String            @db.VarChar(55) 
+  email         String            @db.VarChar(30) @unique
+  password      String            @db.VarChar(70)
+  categories    User_Category[]
+  news          User_News[]       
+  created_at    DateTime          @db.Date @default(now())  
+}
+
+model Category {
+  id      Int       @id @default(autoincrement())
+  name    String    @db.VarChar(30) @unique
+  users   User_Category[]
+  news    News[]
+}
+
+model User_Category {
+  user          User      @relation(fields: [userId],references: [id]) 
+  userId        String    @db.Uuid
+  category      Category  @relation(fields: [categoryId],references: [id])
+  categoryId    Int
+
+  @@id([userId, categoryId])
+}
+
+model News {
+  id          String        @id @db.Uuid
+  title       String        @db.VarChar(150)
+  link        String        @db.VarChar(125)
+  image_url   String        @db.VarChar(125)
+  category    Category      @relation(fields: [categoryId],references: [id])
+  categoryId  Int
+  users       User_News[]
+  saved_at    DateTime      @db.Date @default(now())
+}
+
+model User_News {
+  user     User     @relation(fields: [userId], references: [id])
+  userId   String   @db.Uuid
+  news     News     @relation(fields: [newsId], references: [id])
+  newsId   String   @db.Uuid
+
+  @@id([userId, newsId])
+}

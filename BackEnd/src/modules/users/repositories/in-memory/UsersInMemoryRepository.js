@@ -21,17 +21,23 @@ export class UsersInMemoryRepository {
     return this.INSTANCE;
   }
 
-  async create({ firstname, lastname, email, password } = createUserData) {
-    if (await this.findByEmail(email)) {
-      throw new AppError(400, USER_EMAIL_INVALID_ERROR)
-    }
+  async create({ 
+    firstname, 
+    lastname, 
+    email, 
+    password, 
+    preferences } = createUserData) {
+      if (await this.findByEmail(email)) {
+        throw new AppError(400, USER_EMAIL_INVALID_ERROR)
+      }
 
-    const id = randomUUID()
-    const newUser = new User(id, firstname, lastname, email, password);
+      const id = randomUUID()
+      const newUser = 
+        new User(id, firstname, lastname, email, password, preferences);
 
-    this._repository.push(newUser);
+      this._repository.push(newUser);
 
-    return newUser;
+      return newUser;
   }
 
   async delete(id) {
